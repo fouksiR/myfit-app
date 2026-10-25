@@ -1,0 +1,13 @@
+node_modules/
+dist/
+__pycache__/
+*.pyc
+.DS_Store
+
+# NEVER commit the corpus. Review text is licensed for research use only and
+# must not be redistributed. Aggregates and fitted posteriors are fine.
+brain/data/
+*.tsv
+brain/*.csv
+data/
+web/build/

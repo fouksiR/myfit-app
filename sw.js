@@ -1,6 +1,6 @@
 /* my fit service worker: the app shell for offline opening, and the daily
    reminder (Firebase Cloud Messaging) when it arrives while the app is closed. */
-const CACHE = "myfit-shell-v2";
+const CACHE = "myfit-shell-v3";
 self.addEventListener("install", () => { self.skipWaiting(); });
 self.addEventListener("activate", (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener("fetch", (e) => {
@@ -32,13 +32,14 @@ try {
   const messaging = firebase.messaging();
   messaging.onBackgroundMessage((payload) => {
     const n = (payload && payload.notification) || {};
-    self.registration.showNotification(n.title || "my fit", { body: n.body || "How is it right now? A squeeze takes ten seconds.", icon: "./icon-192.png", badge: "./icon-192.png", tag: "myfit-daily", data: { url: "./" } });
+    self.registration.showNotification(n.title || "my fit", { body: n.body || "How is it right now? A squeeze takes ten seconds.", icon: "./icon-192.png", badge: "./icon-192.png", tag: "myfit-daily", data: { url: "./#checkin" } });
   });
 } catch (e) { /* offline at install: reminders register on the next open */ }
 self.addEventListener("notificationclick", (e) => {
   e.notification.close();
   e.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((cs) => {
-    for (const c of cs) if ("focus" in c) return c.focus();
-    return self.clients.openWindow("./");
+    /* the daily nudge lands straight on today's check-in */
+    for (const c of cs) if ("focus" in c) { if ("navigate" in c) c.navigate("./#checkin").catch(() => {}); return c.focus(); }
+    return self.clients.openWindow("./#checkin");
   }));
 });

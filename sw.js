@@ -1,6 +1,6 @@
 /* my fit service worker: the app shell for offline opening, and the daily
    reminder (Firebase Cloud Messaging) when it arrives while the app is closed. */
-const CACHE = "myfit-shell-v34";
+const CACHE = "myfit-shell-v35";
 self.addEventListener("install", () => { self.skipWaiting(); });
 self.addEventListener("activate", (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener("fetch", (e) => {
